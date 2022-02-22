@@ -1,3 +1,5 @@
+// 이게 되는 건가 잘 모륵따 어떨게 쓰느
+
 import 'package:flutter/material.dart';
 
 void main() {
@@ -7,7 +9,7 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
-  // This widget is the root of your application.
+  // This widget is the root of your application.ㄴ
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
