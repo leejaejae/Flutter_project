@@ -1,70 +1,92 @@
-// 이게 되는 건가 잘 모륵따 어떨게 쓰느
+// Copyright 2019 Aleksander Woźniak
+// SPDX-License-Identifier: Apache-2.0
 
 import 'package:flutter/material.dart';
+import 'package:intl/date_symbol_data_local.dart';
+
+import 'pages/basics_example.dart';
+import 'pages/complex_example.dart';
+import 'pages/events_example.dart';
+import 'pages/multi_example.dart';
+import 'pages/range_example.dart';
 
 void main() {
-  runApp(const MyApp());
+  initializeDateFormatting().then((_) => runApp(MyApp()));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
-
-  // This widget is the root of your application.ㄴ
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'TableCalendar Example',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: StartPage(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
-
-  final String title;
-
+class StartPage extends StatefulWidget {
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  _StartPageState createState() => _StartPageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
+class _StartPageState extends State<StartPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text('TableCalendar Example'),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
+          children: [
+            const SizedBox(height: 20.0),
+            ElevatedButton(
+              child: Text('Basics'),
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => TableBasicsExample()),
+              ),
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
+            const SizedBox(height: 12.0),
+            ElevatedButton(
+              child: Text('Range Selection'),
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => TableRangeExample()),
+              ),
             ),
+            const SizedBox(height: 12.0),
+            ElevatedButton(
+              child: Text('Events'),
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => TableEventsExample()),
+              ),
+            ),
+            const SizedBox(height: 12.0),
+            ElevatedButton(
+              child: Text('Multiple Selection'),
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => TableMultiExample()),
+              ),
+            ),
+            const SizedBox(height: 12.0),
+            ElevatedButton(
+              child: Text('Complex'),
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => TableComplexExample()),
+              ),
+            ),
+            const SizedBox(height: 20.0),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
