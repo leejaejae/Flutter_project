@@ -1,9 +1,5 @@
-// Copyright 2019 Aleksander Woźniak
-// SPDX-License-Identifier: Apache-2.0
-
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
-
 import '../utils.dart';
 
 class TableEventsExample extends StatefulWidget {
@@ -12,41 +8,25 @@ class TableEventsExample extends StatefulWidget {
 }
 
 class _TableEventsExampleState extends State<TableEventsExample> {
-  late final ValueNotifier<List<Event>> _selectedEvents;
-  CalendarFormat _calendarFormat = CalendarFormat.month;
-  RangeSelectionMode _rangeSelectionMode = RangeSelectionMode
-      .toggledOff; // Can be toggled on/off by longpressing a date
-  DateTime _focusedDay = DateTime.now();
+  late final ValueNotifier<List<dynamic>> _selectedEvents;
+  CalendarFormat _calendarFormat = CalendarFormat.month; // 달력 형태,
+  DateTime _focusedDay = DateTime.now(); // 오늘
   DateTime? _selectedDay;
-  DateTime? _rangeStart;
-  DateTime? _rangeEnd;
+  // late final EdgeInsets cellPadding;
 
   @override
   void initState() {
     super.initState();
-
     _selectedDay = _focusedDay;
     _selectedEvents = ValueNotifier(_getEventsForDay(_selectedDay!));
   }
 
   @override
-  void dispose() {
-    _selectedEvents.dispose();
-    super.dispose();
-  }
 
-  List<Event> _getEventsForDay(DateTime day) {
+  /// DateTime 인자를 받아 List를 출력해주는 함수 -> 데이터 모델 list로 반환
+  List<dynamic> _getEventsForDay(DateTime day) {
     // Implementation example
     return kEvents[day] ?? [];
-  }
-
-  List<Event> _getEventsForRange(DateTime start, DateTime end) {
-    // Implementation example
-    final days = daysInRange(start, end);
-
-    return [
-      for (final d in days) ..._getEventsForDay(d),
-    ];
   }
 
   void _onDaySelected(DateTime selectedDay, DateTime focusedDay) {
@@ -54,31 +34,8 @@ class _TableEventsExampleState extends State<TableEventsExample> {
       setState(() {
         _selectedDay = selectedDay;
         _focusedDay = focusedDay;
-        _rangeStart = null; // Important to clean those
-        _rangeEnd = null;
-        _rangeSelectionMode = RangeSelectionMode.toggledOff;
       });
-
       _selectedEvents.value = _getEventsForDay(selectedDay);
-    }
-  }
-
-  void _onRangeSelected(DateTime? start, DateTime? end, DateTime focusedDay) {
-    setState(() {
-      _selectedDay = null;
-      _focusedDay = focusedDay;
-      _rangeStart = start;
-      _rangeEnd = end;
-      _rangeSelectionMode = RangeSelectionMode.toggledOn;
-    });
-
-    // `start` or `end` could be null
-    if (start != null && end != null) {
-      _selectedEvents.value = _getEventsForRange(start, end);
-    } else if (start != null) {
-      _selectedEvents.value = _getEventsForDay(start);
-    } else if (end != null) {
-      _selectedEvents.value = _getEventsForDay(end);
     }
   }
 
@@ -86,66 +43,68 @@ class _TableEventsExampleState extends State<TableEventsExample> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('TableCalendar - Events'),
-      ),
-      body: Column(
-        children: [
-          TableCalendar<Event>(
-            firstDay: kFirstDay,
-            lastDay: kLastDay,
-            focusedDay: _focusedDay,
-            selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-            rangeStartDay: _rangeStart,
-            rangeEndDay: _rangeEnd,
-            calendarFormat: _calendarFormat,
-            rangeSelectionMode: _rangeSelectionMode,
-            eventLoader: _getEventsForDay,
-            startingDayOfWeek: StartingDayOfWeek.monday,
-            calendarStyle: CalendarStyle(
-              // Use `CalendarStyle` to customize the UI
-              outsideDaysVisible: false,
-            ),
-            onDaySelected: _onDaySelected,
-            onRangeSelected: _onRangeSelected,
-            onFormatChanged: (format) {
-              if (_calendarFormat != format) {
-                setState(() {
-                  _calendarFormat = format;
-                });
-              }
-            },
-            onPageChanged: (focusedDay) {
-              _focusedDay = focusedDay;
-            },
+        title: const Text(
+          'DIY Calendar',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 25,
           ),
-          const SizedBox(height: 8.0),
-          Expanded(
-            child: ValueListenableBuilder<List<Event>>(
-              valueListenable: _selectedEvents,
-              builder: (context, value, _) {
-                return ListView.builder(
-                  itemCount: value.length,
-                  itemBuilder: (context, index) {
-                    return Container(
-                      margin: const EdgeInsets.symmetric(
-                        horizontal: 12.0,
-                        vertical: 4.0,
-                      ),
-                      decoration: BoxDecoration(
-                        border: Border.all(),
-                        borderRadius: BorderRadius.circular(12.0),
-                      ),
-                      child: ListTile(
-                        onTap: () => print('${value[index]}'),
-                        title: Text('${value[index]}'),
-                      ),
-                    );
-                  },
-                );
+        ),
+        centerTitle: true,
+      ),
+      body: Container(
+        padding: EdgeInsets.fromLTRB(5, 5, 5, 0),
+        child: Column(
+          children: [
+            TableCalendar<dynamic>(
+              // locale: 'ko-KR',  // 언어 설정, 기본은 영어임
+              firstDay: kFirstDay,
+              lastDay: kLastDay,
+              focusedDay: _focusedDay,
+              selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+              calendarFormat: _calendarFormat,
+              rowHeight: 94.0,
+              daysOfWeekHeight: 30.0,
+              eventLoader: _getEventsForDay,
+              startingDayOfWeek: StartingDayOfWeek.sunday,
+              headerStyle: const HeaderStyle(
+                titleTextStyle: TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
+                headerMargin: EdgeInsets.only(left: 20, top: 10, right: 20, bottom: 15),
+              ),
+              daysOfWeekStyle: const DaysOfWeekStyle(
+                weekdayStyle: TextStyle(color: Colors.black, fontSize: 17),
+                weekendStyle: TextStyle(color: Colors.red, fontSize: 17),
+              ),
+              calendarStyle: CalendarStyle(
+                  defaultTextStyle:
+                      TextStyle(color: Colors.black45, fontSize: 17),
+                  weekendTextStyle:
+                      TextStyle(color: Colors.red, fontSize: 17),
+                  outsideDaysVisible: false, // 이전, 혹은 다음 달의 날짜 표시여부
+                  todayDecoration: BoxDecoration(
+                      // 오늘의 날짜 꾸미기
+                      color: Colors.transparent,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.blueAccent, width: 1.5)),
+                  todayTextStyle: const TextStyle(
+                      // 오늘의 날짜 글씨 꾸미기
+                      // color: Colors.black45,
+                      fontSize: 20)
+              ),
+              onDaySelected: _onDaySelected,
+              onFormatChanged: (format) {
+                if (_calendarFormat != format) {
+                  setState(() {
+                    _calendarFormat = format;
+                  });
+                }
+              },
+              onPageChanged: (focusedDay) {
+                _focusedDay = focusedDay;
               },
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
